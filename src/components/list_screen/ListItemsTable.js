@@ -14,9 +14,14 @@ export class ListItemsTable extends Component {
                     this.props.todoList.items.map((todoItem)=>(
                         <ListItemCard 
                             key={todoItem.key}
-                            listItem={todoItem} />
+                            listItem={todoItem}
+                            moveUp={this.props.moveUp}
+                            moveDown={this.props.moveDown}
+                            delTodo={this.props.delTodo}
+                            editItem={this.props.editItem}/>
                     ))
                 }
+                <div className='list_item_add_card' onClick = {this.props.showItemScreen}>+</div>
             </div>
         )
     }

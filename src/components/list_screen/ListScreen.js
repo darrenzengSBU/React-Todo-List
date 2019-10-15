@@ -3,17 +3,26 @@ import ListHeading from './ListHeading'
 import ListItemsTable from './ListItemsTable'
 import ListTrash from './ListTrash'
 import PropTypes from 'prop-types';
+import DeleteListDialog from './DeleteListDialog';
 
 export class ListScreen extends Component {
     state = {
+        key: '',
         name: '',
         owner: '',
-        completed: ''
+        completed: '',
+        deleteListDialogIsOpen: false
+    }
+
+    getKey() {
+        if(this.props.todoList) {
+            return this.props.todoList.key;
+        }
     }
 
     getListName() {
         if (this.props.todoList) {
-            let name = this.props.todoList.name;
+            //let name = this.props.todoList.name;
             return this.props.todoList.name;
         }
         else
@@ -21,14 +30,14 @@ export class ListScreen extends Component {
     }
     getListOwner() {
         if (this.props.todoList) {
-            let owner = this.props.todoList.owner;
+            //let owner = this.props.todoList.owner;
             return this.props.todoList.owner;
         }
     }
 
     getCompleted() {
         if (this.props.todoList) {
-            let completed = this.props.todoList.completed
+            //let completed = this.props.todoList.completed
             return this.props.todoList.owner;
         }
     }
@@ -45,11 +54,36 @@ export class ListScreen extends Component {
         this.props.changeOwner(this.getListOwner(),this.state.owner)
     }
 
+    moveUp = (e) => {
+        this.props.moveUp(this.getKey(), e)
+    }
+
+    moveDown = (e) => {
+        this.props.moveDown(this.getKey(), e)
+    }
+
+    delTodo = (e) => {
+        this.props.delTodo(this.getKey(), e)
+    }
+
+    delList = (e) => {
+        this.props.delList(this.getKey())
+    }
+
+    showItemScreen = (e) => {
+        this.props.showItemScreen()
+    }
+
+    editItem = (e) => {
+        this.props.editItem(this.getKey(), e)
+    }
+
+
     render() {
         return (
             <div id="todo_list">
                 <ListHeading goHome={this.props.goHome} />
-                <ListTrash />
+                <ListTrash onClick={(e) => this.setState({deleteListDialogIsOpen: true})}/>
                 <div id="list_details_container">
                     <div id="list_details_name_container" className="text_toolbar">
                         <span id="list_name_prompt">Name:</span>
@@ -72,10 +106,25 @@ export class ListScreen extends Component {
                             id="list_owner_textfield" />
                     </div>
                 </div>
-                <ListItemsTable todoList={this.props.todoList} />
+                <ListItemsTable 
+                    todoList={this.props.todoList} 
+                    moveUp={this.moveUp} 
+                    moveDown={this.moveDown}
+                    delTodo={this.delTodo}
+                    showItemScreen={this.showItemScreen}
+                    editItem={this.editItem}/>
+                <DeleteListDialog 
+                    isOpen={this.state.deleteListDialogIsOpen} 
+                    onClose={(e) => this.setState({deleteListDialogIsOpen:false})}
+                    delList= {this.delList}/>
             </div>
         )
     }
+}
+
+// PropTypes
+ListScreen.propTypes = {
+    todoList: PropTypes.object.isRequired
 }
 
 export default ListScreen

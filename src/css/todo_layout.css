@@ -123,6 +123,12 @@ body {
 #item_heading {}
 #item_form_container {
   display: grid;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-Color: #E1E4CB;
+  padding: 10px
 }
 #item_description_prompt {}
 #item_description_textfield {}

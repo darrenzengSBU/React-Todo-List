@@ -14,7 +14,8 @@ class App extends Component {
   state = {
     currentScreen: AppScreen.HOME_SCREEN,
     todoLists: testTodoListData.todoLists,
-    currentList: null
+    currentList: null,
+    itemBeingEdited: null
   }
 
   goHome = () => {
@@ -31,7 +32,7 @@ class App extends Component {
 
   changeName = (listname, name) => {
     this.setState({ todoLists: this.state.todoLists.map(todoList => {
-      console.log(todoList)
+      //console.log(todoList)
       if(todoList.name === listname) {
         todoList.name = name;
       }
@@ -41,12 +42,128 @@ class App extends Component {
 
   changeOwner = (listowner, owner) => {
     this.setState({ todoLists: this.state.todoLists.map(todoList => {
-      console.log(todoList)
+      //console.log(todoList)
       if(todoList.owner === listowner) {
         todoList.owner = owner;
       }
       return todoList;
     })})
+  }
+
+  moveUp = (listkey, itemkey) => {
+    this.setState({todoLists: this.state.todoLists.map(todoList => {
+      if(todoList.key === listkey && itemkey !== 0) {
+        let temp = todoList.items[itemkey];
+        todoList.items[itemkey].key = (itemkey-1)
+        todoList.items[itemkey] = todoList.items[itemkey-1];
+        todoList.items[itemkey-1].key = itemkey
+        todoList.items[itemkey-1] = temp;
+      }
+      return todoList;
+    })})
+  }
+
+  moveDown = (listkey, itemkey) => {
+    this.setState({todoLists: this.state.todoLists.map(todoList => {
+      if(todoList.key === listkey && typeof todoList.items[itemkey+1] !== 'undefined') {
+        let temp = todoList.items[itemkey];
+        todoList.items[itemkey].key = (itemkey+1)
+        todoList.items[itemkey] = todoList.items[itemkey+1];
+        todoList.items[itemkey+1].key = itemkey
+        todoList.items[itemkey+1] = temp;
+      }
+      return todoList;
+    })})
+  }
+  
+  delTodo = (listkey, itemkey) => {
+    this.setState({ todoLists: this.state.todoLists.map(todoList => {
+      if(todoList.key === listkey){
+       let item = todoList.items.findIndex(item => item.key === itemkey)
+       todoList.items.splice(item,1)
+       for (let i=0; i<todoList.items.length; i++) {
+          todoList.items[i].key = i;
+       }
+      }
+      return todoList
+    })})
+  }
+
+  delList = (listKey) => {
+    this.setState({todoLists: [...this.state.todoLists.filter(todoList => todoList.key !== listKey)]})
+    this.goHome();
+  }
+
+  showItemScreen = (e) => {
+    this.setState({currentScreen: AppScreen.ITEM_SCREEN})
+  }
+
+  addItem = (details) => {
+    // console.log(this.state.currentList.key)
+    // console.log(this.state.todoLists[this.state.currentList.key].items.length)
+    details.key = this.state.todoLists[this.state.currentList.key].items.length
+    // console.log(details)
+    this.state.todoLists[this.state.currentList.key].items.push(details)
+    this.setState({currentScreen: AppScreen.LIST_SCREEN})
+  }
+
+  showListScreen = (e) => {
+    //console.log("hi")
+    this.setState({currentScreen: AppScreen.LIST_SCREEN})
+  }
+
+  editItem = (listkey, itemkey) => {
+    // console.log(this.state.todoLists[listKey].items[itemKey])
+    // this.setState({itemBeingEdited: this.state.todoLists[listKey].items[itemKey+1]})
+    // console.log(this.state.itemBeingEdited)
+    // this.showItemScreen()
+    this.setState({ todoLists: this.state.todoLists.map(todoList => {
+      if(todoList.key === listkey){
+       let item = todoList.items[itemkey]
+       //console.log(item)
+       this.setState({itemBeingEdited: item})
+       //console.log(item)
+      }
+      return todoList
+    })})
+    //console.log(this.state.itemBeingEdited)
+    this.showItemScreen()
+  }
+
+  resetTodoItem = (e) => {
+    this.setState({itemBeingEdited: null})
+  }
+
+  modify = (e) => {
+    // console.log(e.target.name)
+    // console.log(e.target.value)
+    let field = e.target.name;
+    let value = e.target.value;
+    if (field === 'description'){
+      this.state.itemBeingEdited.description = value
+      this.forceUpdate()}
+    if (field === 'assigned_to'){
+      this.state.itemBeingEdited.assigned_to = value
+      this.forceUpdate()}
+    if (field === 'due_date'){
+      this.state.itemBeingEdited.due_date = value
+      this.forceUpdate()}
+  }
+
+  modifyCompleted = (e) => {
+    this.state.itemBeingEdited.completed = !this.state.itemBeingEdited.completed
+    this.forceUpdate()
+  }
+
+  modifyItem = (e) => {
+    let itemList = this.state.todoLists[this.state.currentList.key].items
+    for(let i=0; i<itemList.length; i++) {
+      if (itemList[i].key === this.state.itemBeingEdited.key) {
+        itemList[i] = this.state.itemBeingEdited;
+      }
+    }
+    this.resetTodoItem()
+    this.setState({currentScreen: AppScreen.LIST_SCREEN})
   }
 
   render() {
@@ -60,9 +177,23 @@ class App extends Component {
           goHome={this.goHome.bind(this)}
           todoList={this.state.currentList}
           changeName={this.changeName}
-          changeOwner={this.changeOwner} />; 
+          changeOwner={this.changeOwner}
+          moveUp={this.moveUp}
+          moveDown={this.moveDown}
+          delTodo={this.delTodo}
+          delList={this.delList}
+          showItemScreen={this.showItemScreen}
+          editItem={this.editItem}/>; 
       case AppScreen.ITEM_SCREEN:
-        return <ItemScreen />;
+        return <ItemScreen 
+          currentScreen={this.state.currentScreen}
+          todoItem={this.state.itemBeingEdited}
+          addItem={this.addItem}
+          showListScreen={this.showListScreen}
+          resetTodoItem={this.resetTodoItem}
+          modify={this.modify}
+          modifyCompleted={this.modifyCompleted}
+          modifyItem = {this.modifyItem}/>;
       default:
         return <div>ERROR</div>;
     }
