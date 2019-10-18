@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 
 export class DeleteListDialog extends Component {
     render() {
-
         if (!this.props.isOpen) {
             return null
         }
@@ -29,7 +28,7 @@ const style = {
     top: '50%',
     transform: 'translate(-50%, -50%)',
     backgroundColor: '#E1E4CB',
-    padding: '10px'
+    padding: '10px',
 }
 
 const backdropStyle= {

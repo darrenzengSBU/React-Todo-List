@@ -166,12 +166,109 @@ class App extends Component {
     this.setState({currentScreen: AppScreen.LIST_SCREEN})
   }
 
+  createNewList = (e) => {
+    let newList =
+    {
+      "key": this.state.todoLists.length,
+      "name": "Unnknown",
+      "owner": "Unknown",
+      "items": []}
+      this.state.todoLists.push(newList);
+      console.log(newList)
+      console.log(this.state.todoLists)
+      this.forceUpdate()
+      this.setState({currentList: this.state.todoLists[this.state.todoLists.length-1]})
+      this.setState({currentScreen: AppScreen.LIST_SCREEN})
+  }
+
+  sortByTask = (listkey, order) => {
+    let items = this.state.todoLists[listkey].items
+    if (order === 'ascending') {
+      items.sort(function(a,b){
+        var taskA=a.description.toLowerCase(), taskB=b.description.toLowerCase();
+        if (taskA < taskB)
+          return -1;
+        if (taskA > taskB)
+          return 1
+        return 0;
+      })
+      for (let i=0; i<items.length; i++) {
+        items[i].key = i;
+     }
+    }
+    else {
+      items.sort(function(a,b){
+        var taskA=a.description.toLowerCase(), taskB=b.description.toLowerCase();
+        if (taskA < taskB)
+          return 1;
+        if (taskA > taskB)
+          return -1
+        return 0;
+      })
+    }
+    for (let i=0; i<items.length; i++) {
+      items[i].key = i;
+   }
+  }
+
+  sortByDueDate = (listkey, order) => {
+    let items = this.state.todoLists[listkey].items
+    if (order === 'ascending') {
+      items.sort(function(a,b){
+        var taskA=a.due_date.toLowerCase(), taskB=b.due_date.toLowerCase();
+        if (taskA < taskB)
+          return -1;
+        if (taskA > taskB)
+          return 1
+        return 0;
+      })
+    }
+    else {
+      items.sort(function(a,b){
+        var taskA=a.due_date, taskB=b.due_date;
+        if (taskA < taskB)
+          return 1;
+        if (taskA > taskB)
+          return -1
+        return 0;
+      })
+    }
+    for (let i=0; i<items.length; i++) {
+      items[i].key = i;
+   }
+  }
+
+  sortByStatus = (listkey, order) => {
+    let items = this.state.todoLists[listkey].items
+    if (order === 'ascending') {
+      items.sort(function(a,b){
+        var taskA=a.completed, taskB=b.completed;
+        if (taskA < taskB)
+          return -1;
+        if (taskA > taskB)
+          return 1
+        return 0;
+      })
+    }
+    else {
+      items.sort(function(a,b){
+        var taskA=a.completed, taskB=b.completed;
+        if (taskA < taskB)
+          return 1;
+        if (taskA > taskB)
+          return -1
+        return 0;
+      })
+    }
+  }
+
   render() {
     switch(this.state.currentScreen) {
       case AppScreen.HOME_SCREEN:
         return <HomeScreen 
         loadList={this.loadList.bind(this)} 
-        todoLists={this.state.todoLists} />;
+        todoLists={this.state.todoLists}
+        createNewList={this.createNewList} />;
       case AppScreen.LIST_SCREEN:            
         return <ListScreen
           goHome={this.goHome.bind(this)}
@@ -183,7 +280,10 @@ class App extends Component {
           delTodo={this.delTodo}
           delList={this.delList}
           showItemScreen={this.showItemScreen}
-          editItem={this.editItem}/>; 
+          editItem={this.editItem}
+          sortByTask={this.sortByTask}
+          sortByDueDate={this.sortByDueDate}
+          sortByStatus={this.sortByStatus}/>; 
       case AppScreen.ITEM_SCREEN:
         return <ItemScreen 
           currentScreen={this.state.currentScreen}

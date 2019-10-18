@@ -149,7 +149,7 @@ export class ItemScreen extends Component {
 
 ItemScreen.propTypes = {
     currentScreen: PropTypes.string.isRequired,
-    todoItem: PropTypes.object.isRequired
+    //todoItem: PropTypes.object.isRequired
 }
 
 const style = {

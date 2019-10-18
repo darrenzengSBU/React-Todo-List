@@ -78,6 +78,17 @@ export class ListScreen extends Component {
         this.props.editItem(this.getKey(), e)
     }
 
+    sortByTask = (e, order) => {
+        this.props.sortByTask(this.getKey(), order)
+    }
+
+    sortByDueDate = (e, order) => {
+        this.props.sortByDueDate(this.getKey(), order)
+    }
+
+    sortByStatus = (e, order) => {
+        this.props.sortByStatus(this.getKey(), order)
+    }
 
     render() {
         return (
@@ -112,7 +123,10 @@ export class ListScreen extends Component {
                     moveDown={this.moveDown}
                     delTodo={this.delTodo}
                     showItemScreen={this.showItemScreen}
-                    editItem={this.editItem}/>
+                    editItem={this.editItem}
+                    sortByTask={this.sortByTask}
+                    sortByDueDate={this.sortByDueDate}
+                    sortByStatus={this.sortByStatus}/>
                 <DeleteListDialog 
                     isOpen={this.state.deleteListDialogIsOpen} 
                     onClose={(e) => this.setState({deleteListDialogIsOpen:false})}
